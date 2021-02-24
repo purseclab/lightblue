@@ -5,13 +5,30 @@ import logging
 from IPython import embed
 logging.disable(logging.CRITICAL)
 
-# constants for dev board
-dev_bin_path = "../bin/dev/CYPRESS920735Q60EVB-01.bin"
+# dev board
+dev_bin_path = "../firmware/CYPRESS920735Q60EVB-01.bin"
 dev_addr = 0x18741
 dev_ogf_reg = "r7"
 dev_ocf_reg = "r6"
 dev_handler_addr = 0x18841
 dev_handler_reg = "r3"
+
+# rasp 
+rasp_bin_path = "../firmware/BCM2837 (Raspberry pi 3).bin"
+rasp_addr = 0x1bf39
+rasp_ogf_reg = "r9"
+rasp_ocf_reg = "r8"
+rasp_handler_addr = 0x1bffd
+rasp_handler_reg = "r3"
+
+# nexus 
+nexus_bin_path = "../firmware/BCM4339 (Nexus 5).bin"
+nexus_addr = 0x99e1
+nexus_ogf_reg = "r0"
+nexus_ocf_reg = "r1"
+nexus_handler_addr = 0x9a13
+nexus_handler_reg = "r0"
+
 
 # bluetooth opcode
 opcode_list = [(0x1, 0x45), (0x2, 0x11), (0x3, 0x83), (0x4, 0x0f), (0x5, 0x0d),
@@ -30,13 +47,29 @@ def get_entry_point(path):
 
 
 def main(argv):
-    # TODO: support more boards
-    bin_path = dev_bin_path
-    start_addr = dev_addr
-    ogf_reg = dev_ogf_reg
-    ocf_reg = dev_ocf_reg
-    handler_addr = dev_handler_addr
-    handler_reg = dev_handler_reg
+    if argv[0] == "dev":
+        bin_path = dev_bin_path
+        start_addr = dev_addr
+        ogf_reg = dev_ogf_reg
+        ocf_reg = dev_ocf_reg
+        handler_addr = dev_handler_addr
+        handler_reg = dev_handler_reg
+    elif argv[0] == "rasp":
+        bin_path = rasp_bin_path
+        start_addr = rasp_addr
+        ogf_reg = rasp_ogf_reg
+        ocf_reg = rasp_ocf_reg
+        handler_addr = rasp_handler_addr
+        handler_reg = rasp_handler_reg
+    elif argv[0] == "nexus":
+        bin_path = nexus_bin_path
+        start_addr = nexus_addr
+        ogf_reg = nexus_ogf_reg
+        ocf_reg = nexus_ocf_reg
+        handler_addr = nexus_handler_addr
+        handler_reg = nexus_handler_reg
+    else:
+        raise ValueError('mode error!')
 
     entry_point = get_entry_point(bin_path)
     print("entry point: ", entry_point)

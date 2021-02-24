@@ -19,8 +19,8 @@ BD_ADDR handler address, they are acquired by
     2. locating the func that reference BDADDR
 '''
 DEV_BDADDR_HANDLER_ADDR = 0x3ec59
-RASP_BDADDR_HANDLER_ADDR = 0x3ec59
-NEXUS_BDADDR_HANDLER_ADDR = 0x3ec59
+RASP_BDADDR_HANDLER_ADDR = 0x259b5
+NEXUS_BDADDR_HANDLER_ADDR = 0x651bf
 
 
 def get_entry_point(path):
@@ -280,12 +280,20 @@ def identification(proj, cfg, funcs):
 
 
 def main(argv):
-    # TODO: support for more targets
-    bin_path = "../bin/dev/CYPRESS920735Q60EVB-01.bin"
     global MODE
-    MODE = "DEV"
-    # MODE = "RASP"
-    # MODE = "NEXUS"
+
+    if argv[0] == "dev":
+        MODE = "DEV"
+        bin_path = "../firmware/CYPRESS920735Q60EVB-01.bin"
+    elif argv[0] == "rasp":
+        MODE = "RASP"
+        bin_path = "../firmware/BCM2837 (Raspberry pi 3).bin"
+    elif argv[0] == "nexus":
+        MODE = "NEXUS"
+        bin_path = "../firmware/BCM4339 (Nexus 5).bin"
+    else:
+        raise ValueError('mode error!')
+
 
     entry_point = int(get_entry_point(bin_path), 16)
     assert entry_point == 0x03bd
