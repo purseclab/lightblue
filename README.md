@@ -10,9 +10,13 @@ The *bitcodes* folder contains the bitcode files that are used in LightBlue and 
 
 The *scripts* folder contains all the scripts used in LightBlue and this documentation.
 
-We debloat the host Bluetooth stack based on LLVM framework, therefore, there are 3 general steps to debloat the host stack.
+The *firmware* folder contains all the dumped firmware used in LightBlue.
+
+The *firmware_analysis* folder contains the code for firmware analysis.
 
 ## 1. Host Code Debloating
+
+We debloat the host Bluetooth stack based on LLVM framework, therefore, there are 3 general steps to debloat the host stack.
 
 1. Generate the host stack LLVM bitcode.
 
@@ -369,3 +373,17 @@ We take A2DP as an example.
 ```
 
 ## 2. Firmware Debloating
+
+1. Dump firmware.
+
+2. Firmware analysis.
+
+With analysis.py, we identify the instruction address and resgister which relates to HCI opcode and command handler. 
+
+3. HCI command handler extraction.
+
+With the information from Firmware analysis, we extract the address for each HCI command handler. 
+
+4. Firmware rewriting.
+
+After identifying HCI command handler, we set the unneeded handler as dummy code. rewriting.py is a demo of keeping A2DP on CYPRESS920735Q60EVB. 
