@@ -1,6 +1,6 @@
 # LightBlue
 
-This is the code repository for our USENIX'21 paper ([LIGHTBLUE : Automatic Profile-Aware Debloating of Bluetooth Stacks](http://a_link)).
+This is the code repository for our USENIX'21 paper ([LIGHTBLUE : Automatic Profile-Aware Debloating of Bluetooth Stacks](https://github.com/purseclab/lightblue/raw/master/lightblue.pdf)).
 
 ## 0. Directory Explanation
 
