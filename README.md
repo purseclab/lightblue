@@ -229,7 +229,7 @@ Add *LOCAL_CLANG := true* and *LOCAL_CLANG_CFLAGS += -flto* to the following fil
   andrsource/system/bt/tools/bdtool/Android.mk
   andrsource/system/bt/utils/Android.mk
 ```
-We provide a *bluedroid_flag.diff* (under the script folder) file for reference of the changes (note that the flags need to be added at two different locations in device/Android.mk file).
+We provide a *bluedroid_flag.diff* (under the scripts folder) file for reference of the changes (note that the flags need to be added at two different locations in device/Android.mk file).
 
 After the modification, running *mma -j4 --keep-going* under 'andrsource/system/bt/' folder to generate the bitcode file.
 There will be link errors, but it's OK.
