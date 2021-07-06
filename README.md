@@ -228,7 +228,7 @@ Add *LOCAL_CLANG := true* and *LOCAL_CLANG_CFLAGS += -flto* to the following fil
   andrsource/system/bt/utils/Android.mk
 ```
 
-After the modification, running *mma --keep-going* again under 'andrsource/system/bt/' folder to generate the bitcode file.
+After the modification, running *mma --keep-going* under 'andrsource/system/bt/' folder to generate the bitcode file.
 There will be link errors, but it's OK.
 Run the 'link_bluedroid.sh' script (you should change the *OBJ* variable accordingly) to link the bitcode and generate the whole program bitcode:
 
