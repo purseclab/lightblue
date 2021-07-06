@@ -1,0 +1,171 @@
+diff --git a/audio_a2dp_hw/Android.mk b/audio_a2dp_hw/Android.mk
+index 959c255d2..5d8422641 100644
+--- a/audio_a2dp_hw/Android.mk
++++ b/audio_a2dp_hw/Android.mk
+@@ -12,6 +12,10 @@ LOCAL_C_INCLUDES += \
+ 
+ LOCAL_CFLAGS += -std=c99 $(bdroid_CFLAGS)
+ 
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
++
+ LOCAL_MODULE := audio.a2dp.default
+ LOCAL_MODULE_RELATIVE_PATH := hw
+ 
+diff --git a/bta/Android.mk b/bta/Android.mk
+index 9f3de3afe..4cf541829 100644
+--- a/bta/Android.mk
++++ b/bta/Android.mk
+@@ -8,6 +8,9 @@ LOCAL_CFLAGS += \
+ endif
+ LOCAL_CFLAGS += -DBUILDCFG $(bdroid_CFLAGS) -std=c99
+ LOCAL_CLANG_CFLAGS += -Wno-error=gnu-variable-sized-type-not-at-end
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
+ 
+ LOCAL_SRC_FILES:= \
+     ./dm/bta_dm_ci.c \
+diff --git a/device/Android.mk b/device/Android.mk
+index 56d303f91..75b12d0de 100644
+--- a/device/Android.mk
++++ b/device/Android.mk
+@@ -21,7 +21,11 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ 
+ # osi/include/atomic.h depends on gcc atomic functions
+-LOCAL_CLANG := false
++# LOCAL_CLANG := false
++
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
+ 
+ LOCAL_C_INCLUDES := \
+     $(LOCAL_PATH)/.. \
+@@ -52,7 +56,11 @@ include $(BUILD_STATIC_LIBRARY)
+ include $(CLEAR_VARS)
+ 
+ # osi/include/atomic.h depends on gcc atomic functions
+-LOCAL_CLANG := false
++# LOCAL_CLANG := false
++
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
+ 
+ LOCAL_C_INCLUDES := \
+     $(LOCAL_PATH)/.. \
+diff --git a/embdrv/sbc/decoder/Android.mk b/embdrv/sbc/decoder/Android.mk
+index 68fd143c5..06c7a6c96 100755
+--- a/embdrv/sbc/decoder/Android.mk
++++ b/embdrv/sbc/decoder/Android.mk
+@@ -21,6 +21,10 @@ LOCAL_SRC_FILES+= \
+ LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
+ LOCAL_C_INCLUDES += $(LOCAL_PATH)/srce
+ 
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
++
+ LOCAL_MODULE:= libbt-qcom_sbc_decoder
+ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE_CLASS := STATIC_LIBRARIES
+diff --git a/hci/Android.mk b/hci/Android.mk
+index af87285d1..f12989b42 100644
+--- a/hci/Android.mk
++++ b/hci/Android.mk
+@@ -24,6 +24,9 @@ LOCAL_CFLAGS += -DHCI_USE_MCT
+ endif
+ 
+ LOCAL_CFLAGS += -std=c99 $(bdroid_CFLAGS)
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
+ 
+ LOCAL_C_INCLUDES += \
+     $(LOCAL_PATH)/include \
+diff --git a/main/Android.mk b/main/Android.mk
+index ff7b4a503..6bf928d74 100644
+--- a/main/Android.mk
++++ b/main/Android.mk
+@@ -172,5 +172,8 @@ LOCAL_MULTILIB := 32
+ 
+ LOCAL_CLANG_CFLAGS := -Wno-error=gnu-variable-sized-type-not-at-end
+ LOCAL_CLANG_CFLAGS += -Wno-typedef-redefinition
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
+ 
+ include $(BUILD_SHARED_LIBRARY)
+diff --git a/profile/Android.mk b/profile/Android.mk
+index 5683d7fbf..1b43964d8 100644
+--- a/profile/Android.mk
++++ b/profile/Android.mk
+@@ -31,6 +31,10 @@ LOCAL_C_INCLUDES := \
+ LOCAL_SRC_FILES := \
+     src/manager.c
+ 
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
++
+ LOCAL_CFLAGS := $(bdroid_CFLAGS)
+ LOCAL_CONLYFLAGS := $(bdroid_CONLYFLAGS)
+ LOCAL_MODULE := libbtprofile
+diff --git a/stack/Android.mk b/stack/Android.mk
+index ccb5dc61a..184bedf86 100644
+--- a/stack/Android.mk
++++ b/stack/Android.mk
+@@ -170,5 +170,8 @@ LOCAL_MULTILIB := 32
+ # a struct.
+ # const-logical-operand is needed for code in l2c_utils.c that looks intentional.
+ LOCAL_CLANG_CFLAGS += -Wno-error=gnu-variable-sized-type-not-at-end -Wno-error=constant-logical-operand
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
+ 
+ include $(BUILD_STATIC_LIBRARY)
+diff --git a/tools/bdtool/Android.mk b/tools/bdtool/Android.mk
+index 7ed5c4a31..e71bb7eaa 100644
+--- a/tools/bdtool/Android.mk
++++ b/tools/bdtool/Android.mk
+@@ -35,6 +35,10 @@ LOCAL_STATIC_LIBRARIES := \
+ 
+ LOCAL_CFLAGS := -std=c99 $(bdroid_CFLAGS) -Wno-unused-parameter -Wno-missing-field-initializers
+ 
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
++
+ LOCAL_C_INCLUDES := \
+   $(LOCAL_PATH)/../../test/suite \
+   $(LOCAL_PATH)/../..
+diff --git a/tools/hci/Android.mk b/tools/hci/Android.mk
+index 9477db307..6a80c4734 100644
+--- a/tools/hci/Android.mk
++++ b/tools/hci/Android.mk
+@@ -21,6 +21,10 @@ include $(CLEAR_VARS)
+ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE := net_hci
+ 
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
++
+ LOCAL_SRC_FILES := main.c
+ LOCAL_STATIC_LIBRARIES := libosi
+ LOCAL_CFLAGS := -std=c99 $(bdroid_CFLAGS)
+diff --git a/utils/Android.mk b/utils/Android.mk
+index 8e3fe39ce..f598f4657 100644
+--- a/utils/Android.mk
++++ b/utils/Android.mk
+@@ -19,4 +19,7 @@ LOCAL_MODULE := libbt-utils
+ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE_CLASS := STATIC_LIBRARIES
+ 
++# add flag to emit-llvm
++LOCAL_CLANG := true
++LOCAL_CLANG_CFLAGS += -flto
+ include $(BUILD_STATIC_LIBRARY)
