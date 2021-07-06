@@ -35,6 +35,7 @@ llvm-link $OBJ/SHARED_LIBRARIES/bluetooth.default_intermediates/*.o\
     $OBJ/STATIC_LIBRARIES/libbt-brcm_stack_intermediates/smp/*.o\
     $OBJ/STATIC_LIBRARIES/libbt-brcm_stack_intermediates/srvc/*.o\
     $OBJ/STATIC_LIBRARIES/libbt-hci_intermediates/src/*.o\
+    $OBJ/STATIC_LIBRARIES/libbtprofile_intermediates/src/*.o\
     $OBJ/STATIC_LIBRARIES/libbt-qcom_sbc_decoder_intermediates/srce/*.o\
     $OBJ/STATIC_LIBRARIES/libbt-utils_intermediates/src/*.o\
     $OBJ/STATIC_LIBRARIES/libbtdevice_intermediates/src/*.o\
