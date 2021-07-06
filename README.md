@@ -376,16 +376,97 @@ We take A2DP as an example.
 
 ## 2. Firmware Debloating
 
-1. Dump firmware.
+## 2. Firmware Debloating
 
-2. Firmware analysis.
+### 2.1 Dependency 
 
-With analysis.py, we identify the instruction address and resgister which relates to HCI opcode and command handler. 
+#### 2.1.1 [angr](http://angr.io/)
 
-3. HCI command handler extraction.
+```
+$ mkvirtualenv lightblue
+$ pip install angr
+```
 
-With the information from Firmware analysis, we extract the address for each HCI command handler. 
+#### 2.1.2 [internalblue](https://github.com/seemoo-lab/internalblue)
 
-4. Firmware rewriting.
+```
+git clone https://github.com/seemoo-lab/internalblue
+cd internalblue
+source lightblue/bin/activate
+pip install --editable ./
+```
 
-After identifying HCI command handler, we set the unneeded handler as dummy code. rewriting.py is a demo of keeping A2DP on CYPRESS920735Q60EVB. 
+On Ubuntu 20.04, there could be issue with binutils dependency. If "pwnlib is not installed" is prompted, please install [Python 2 version](https://github.com/seemoo-lab/internalblue/releases/tag/python2) 
+
+
+### 2.2 Firmware dumping
+For Broadcom/Cypress Bluetooth chip listed below, internalblue offers a nice utility to dump the firmware:
+- BCM4339 (Nexus 5)
+- BCM2837 (Raspberry pi 3)
+- CYPRESS 920735Q60EVB-01
+
+After installing internalblue, you can use following commands to dump firmware: 
+```
+$ internalblue
+$ dumpmem
+```
+We include the firmware of BCM4339 (Nexus 5), BCM2837 (Raspberry pi 3), CYPRESS 920735Q60EVB-01 in ```/firmware```. 
+
+For Zephyr devices, we acquire the binary blob by compiling its source code from https://github.com/zephyrproject-rtos/zephyr/tree/master/subsys/bluetooth. 
+We include the firmware of nrf52_pca10040 (acting as a beacon) in ```/firmware```
+
+### 2.3 Firmware analysis
+
+This step identify the instruction address and resgister which relates to HCI opcode/command handler, and locate the HCI command dispatcher function. 
+
+```
+$ python3 analysis.py TARGET
+```
+
+```TARGET``` is one of the following: 
+
+- ```DEV```: CYPRESS 920735Q60EVB-01
+- ```NEXUS```: BCM4339 (Nexus 5)
+- ```RASP```: BCM2837 (Raspberry pi 3)
+- ```NRF```: nRF52 Development Kit (PCA10040) 
+
+It will return the address of the HCI command dispatcher and corresponding registers. This command takes around 20 minutes since it takes some time for angr to recover CFG. 
+
+### 2.4 HCI command handler extraction
+
+With the information from 2.3 Firmware analysis, we extract the address for each HCI command handler in this step. 
+
+### 2.5 Firmware rewriting and examples
+
+#### 2.5.1 Only keeping A2DP on CYPRESS 920735Q60EVB-01
+It is an example where all other profiles except A2DP (audio) is debloated on a Cypress development board. 
+
+To dump the firmware and do rewriting, you have to configure first. 
+The following steps are required to use the CYW20735B1 evaluation kit as normal HCI device on Linux with BlueZ.
+You need to set the baud rate to 3 Mbit/s. Replace ```/dev/ttyUSB0``` with your device.
+
+```
+$ btattach -B /dev/ttyUSB0 -S 3000000
+```
+
+If this does not work directly, use:
+
+```
+$ stty -F /dev/ttyUSB0 3000000
+$ btattach -B /dev/ttyUSB0
+```
+
+Sometimes, you need to plug/unplug the evaluation board multiple times and run a combination of the commands above. 
+If setup was successful can be checked with hciconfig. A MAC address with all zeros indicates that the baud rate was not set correctly and you need to try again.
+
+
+Run “python dev_analysis.py”, which will output the rewriting address for the script “a2dp-debloat.py”. 
+
+Then you can run ```$ python a2dp-debloat.py``` for debloating the Bluetooth firmware. 
+
+```a2dp-debloat.py``` has already embedded the needed HCI command (line 74 - line 220). 
+It uses internalblue rewriting utility to rewrite the Bluetooth firmware, and disable the unneeded HCI commands. 
+
+
+#### 2.5.2 Only keeping GATT on Nexus 5 (Sqaure App example)
+It is an example where the Bluetooth stack (including host and firmware) on Nexus 5 is specialized for Squaure, a point-of-sale app. 
