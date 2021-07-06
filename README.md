@@ -212,21 +212,23 @@ Then we compile other file with clang and generate the bitcode.
 After running the LLVM pass and recompile to object code, we link all the object files together to generate the BlueDroid stack.
 Therefore, the next step is to modify the *Android.mk* files so that we can generate the bitcode.
 
-Add *LOCAL_CLANG_CFLAGS += -flto* to the following files and comment out the 24 Line (i.e., *LOCAL_CLANG := false*) in 'andrsource/system/bt/device/Android.mk' file:
+Add *LOCAL_CLANG := true* and *LOCAL_CLANG_CFLAGS += -flto* to the following files and comment out the 24 Line (i.e., *LOCAL_CLANG := false*) in 'andrsource/system/bt/device/Android.mk' file:
 
 ```
   andrsource/system/bt/audio_a2dp_hw/Android.mk
   andrsource/system/bt/bta/Android.mk
+  andrsource/system/bt/device/Android.mk
   andrsource/system/bt/embdrv/sbc/decoder/Android.mk
   andrsource/system/bt/hci/Android.mk
   andrsource/system/bt/main/Android.mk
   andrsource/system/bt/profile/Android.mk
   andrsource/system/bt/stack/Android.mk
   andrsource/system/bt/tools/hci/Android.mk
+  andrsource/system/bt/tools/bdtool/Android.mk
   andrsource/system/bt/utils/Android.mk
 ```
 
-After the modification, running *mma* again under 'andrsource/system/bt/' folder to generate the bitcode file.
+After the modification, running *mma --keep-going* again under 'andrsource/system/bt/' folder to generate the bitcode file.
 There will be link errors, but it's OK.
 Run the 'link_bluedroid.sh' script (you should change the *OBJ* variable accordingly) to link the bitcode and generate the whole program bitcode:
 
