@@ -205,7 +205,7 @@ In short, we can run the following command to compile the Bluetooth stack only:
   $ source build/envsetup.sh
   $ lunch aosp_hammerhead-userdebug
   $ cd system/bt
-  $ git apply android_receive_diagnostics.diff  # if available in the corresponding InternalBlue folder
+  $ git apply android_receive_diagnostics.diff  # android_receive_diagnostics.diff is provided in internalblue
   $ bdroid_CFLAGS='-DBT_NET_DEBUG=TRUE' mma -j4
 ```
 
@@ -231,7 +231,11 @@ Add *LOCAL_CLANG := true* and *LOCAL_CLANG_CFLAGS += -flto* to the following fil
 ```
 We provide a *bluedroid_flag.diff* (under the scripts folder) file for reference of the changes (note that the flags need to be added at two different locations in device/Android.mk file).
 
-After the modification, running *mma -j4 --keep-going* under 'andrsource/system/bt/' folder to generate the bitcode file.
+After the modification, run
+```
+$ bdroid_CFLAGS='-DBT_NET_DEBUG=TRUE' mma -j4 --keep-going
+```
+under 'andrsource/system/bt/' folder to generate the bitcode file.
 There will be link errors, but it's OK.
 Run the 'link_bluedroid.sh' script (you should change the *OBJ* variable accordingly) to link the bitcode and generate the whole program bitcode:
 
