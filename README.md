@@ -261,8 +261,15 @@ We take A2DP as an example.
 
 ```
   $ opt bluedroid.bc -load ./BTanalysis.so -btanalysis -btstack bluedroid -profile a2dp -o a2dp.bc 
-  $ bluedroid_ir2obj.sh a2dp.bc a2dp.so
+  $ sh bluedroid_ir2obj.sh a2dp.bc a2dp.so
   $ sh nexus5_change_lib.sh a2dp.so
+```
+For the Square app case in the paper, keep the GATT profile and run the following commands.
+
+```
+  $ opt bluedroid.bc -load ./BTanalysis.so -btanalysis -btstack bluedroid -profile gatt -o gatt.bc 
+  $ sh bluedroid_ir2obj.sh gatt.bc gatt.so
+  $ sh nexus5_change_lib.sh gatt.so
 ```
 
 ### 4. Fluoride Host Debloating
@@ -377,7 +384,7 @@ We take A2DP as an example.
 
 ```
   $ opt fluoride.bc -load ./BTanalysis.so -btanalysis -btstack fluoride -profile a2dp -o a2dp.bc 
-  $ fluoride_ir2obj.sh a2dp.bc a2dp.so
+  $ sh fluoride_ir2obj.sh a2dp.bc a2dp.so
   $ sh pixel_change_lib.sh a2dp.so
 ```
 
