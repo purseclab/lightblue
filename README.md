@@ -376,9 +376,8 @@ We take A2DP as an example.
 
 ## 2. Firmware Debloating
 
-## 2. Firmware Debloating
-
 ### 2.1 Dependency 
+It is recommnded to use Dockerfile in ```firmware_analysis```.
 
 #### 2.1.1 [angr](http://angr.io/)
 
@@ -425,10 +424,10 @@ $ python3 analysis.py TARGET
 
 ```TARGET``` is one of the following: 
 
-- ```DEV```: CYPRESS 920735Q60EVB-01
-- ```NEXUS```: BCM4339 (Nexus 5)
-- ```RASP```: BCM2837 (Raspberry pi 3)
-- ```NRF```: nRF52 Development Kit (PCA10040) 
+- ```dev```: CYPRESS 920735Q60EVB-01
+- ```nexus```: BCM4339 (Nexus 5)
+- ```rasp```: BCM2837 (Raspberry pi 3)
+- ```nrf```: nRF52 Development Kit (PCA10040) 
 
 It will return the address of the HCI command dispatcher and corresponding registers. This command takes around 20 minutes since it takes some time for angr to recover CFG. 
 

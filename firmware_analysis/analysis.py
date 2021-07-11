@@ -296,7 +296,10 @@ def main(argv):
 
 
     entry_point = int(get_entry_point(bin_path), 16)
-    assert entry_point == 0x03bd
+    if MODE == "DEV":
+        assert entry_point == 0x03bd
+    elif MODE == "NEXUS":
+        assert entry_point == 0x0201
 
     proj = angr.Project(bin_path,
                         main_opts={
