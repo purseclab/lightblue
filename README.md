@@ -194,8 +194,10 @@ The following command can be used to check that branch out:
 ```
 
 The building tutorial is similar to [Sony's tutorial (https://developer.sony.com/develop/open-devices/guides/aosp-build-instructions/build-aosp-nougat-marshmallow-6-0-1/#tutorial-step-1)](https://developer.sony.com/develop/open-devices/guides/aosp-build-instructions/build-aosp-nougat-marshmallow-6-0-1/#tutorial-step-1).
-But we don't need to build the whole system, we only need to compile the Bluetooth stack.
-Therefore, once the preparation is done, run the following command to compile the Bluetooth stack only:
+
+In the firmware debloating part, we will need the internalblue framework. So we need to enable the *debug* feature of the stack and make some changes to make the stack works with internalblue.
+We can follow this [document](https://github.com/seemoo-lab/internalblue/blob/master/doc/android.md) to enable the *debug* feature and make the changes.
+In short, we can run the following command to compile the Bluetooth stack only:
 
 ```
   // assume the source code is under 'andrsource' folder
@@ -203,7 +205,8 @@ Therefore, once the preparation is done, run the following command to compile th
   $ source build/envsetup.sh
   $ lunch aosp_hammerhead-userdebug
   $ cd system/bt
-  $ mma
+  $ git apply android_receive_diagnostics.diff  # android_receive_diagnostics.diff is provided in internalblue
+  $ bdroid_CFLAGS='-DBT_NET_DEBUG=TRUE' mma -j4
 ```
 
 Once compiling is finished, the BlueDroid stack is generated and the intermediate object files are generated.
@@ -213,7 +216,6 @@ After running the LLVM pass and recompile to object code, we link all the object
 Therefore, the next step is to modify the *Android.mk* files so that we can generate the bitcode.
 
 Add *LOCAL_CLANG := true* and *LOCAL_CLANG_CFLAGS += -flto* to the following files and comment out the 24 Line (i.e., *LOCAL_CLANG := false*) in 'andrsource/system/bt/device/Android.mk' file:
-
 ```
   andrsource/system/bt/audio_a2dp_hw/Android.mk
   andrsource/system/bt/bta/Android.mk
@@ -227,8 +229,13 @@ Add *LOCAL_CLANG := true* and *LOCAL_CLANG_CFLAGS += -flto* to the following fil
   andrsource/system/bt/tools/bdtool/Android.mk
   andrsource/system/bt/utils/Android.mk
 ```
+We provide a *bluedroid_flag.diff* (under the scripts folder) file for reference of the changes (note that the flags need to be added at two different locations in device/Android.mk file).
 
-After the modification, running *mma --keep-going* under 'andrsource/system/bt/' folder to generate the bitcode file.
+After the modification, run
+```
+$ bdroid_CFLAGS='-DBT_NET_DEBUG=TRUE' mma -j4 --keep-going
+```
+under 'andrsource/system/bt/' folder to generate the bitcode file.
 There will be link errors, but it's OK.
 Run the 'link_bluedroid.sh' script (you should change the *OBJ* variable accordingly) to link the bitcode and generate the whole program bitcode:
 
@@ -254,8 +261,15 @@ We take A2DP as an example.
 
 ```
   $ opt bluedroid.bc -load ./BTanalysis.so -btanalysis -btstack bluedroid -profile a2dp -o a2dp.bc 
-  $ bluedroid_ir2obj.sh a2dp.bc a2dp.so
+  $ sh bluedroid_ir2obj.sh a2dp.bc a2dp.so
   $ sh nexus5_change_lib.sh a2dp.so
+```
+For the Square app case in the paper, keep the GATT profile and run the following commands.
+
+```
+  $ opt bluedroid.bc -load ./BTanalysis.so -btanalysis -btstack bluedroid -profile gatt -o gatt.bc 
+  $ sh bluedroid_ir2obj.sh gatt.bc gatt.so
+  $ sh nexus5_change_lib.sh gatt.so
 ```
 
 ### 4. Fluoride Host Debloating
@@ -370,7 +384,7 @@ We take A2DP as an example.
 
 ```
   $ opt fluoride.bc -load ./BTanalysis.so -btanalysis -btstack fluoride -profile a2dp -o a2dp.bc 
-  $ fluoride_ir2obj.sh a2dp.bc a2dp.so
+  $ sh fluoride_ir2obj.sh a2dp.bc a2dp.so
   $ sh pixel_change_lib.sh a2dp.so
 ```
 
