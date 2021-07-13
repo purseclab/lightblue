@@ -52,12 +52,12 @@ def check_regs_val(state, value):
     regs.append(state.regs.r8)
     regs.append(state.regs.r9)
     regs.append(state.regs.r10)
-    
+
     for reg in regs:
         if reg.concrete:
             if reg.args[0] == value:
                 return True
-    
+
     return False
 
 
@@ -201,13 +201,15 @@ def check_symbolic_pattern(state):
 
                 if (OGF_pattern and OCF_pattern):
                     return True, x_idx, y_idx, z_idx
-                
+
                 # if the opcode reg is reused
                 for arg_y in y_val.args:
                     for arg_z in z_val.args:
                         try:
                             if arg_y.args[2].args[0] == arg_z.args[2].args[0]:
-                                if arg_y.args[0] == 0xf and arg_y.args[1] == 0xa and arg_z.args[0] == 0x9 and arg_z.args[1] == 0x0:
+                                if arg_y.args[0] == 0xf and arg_y.args[
+                                        1] == 0xa and arg_z.args[
+                                            0] == 0x9 and arg_z.args[1] == 0x0:
                                     return True, 0, y_idx, z_idx
                         except:
                             continue
@@ -264,33 +266,36 @@ def symbolic_verification(proj, hci_cmd_disp_cand):
             target_entry_state = proj.factory.blank_state(addr=cand[1])
             OGF_src_name = "target_entry_state.regs.r" + str(cand[3])
             OCF_src_name = "target_entry_state.regs.r" + str(cand[4])
-            exec(OGF_src_name + " = 0x04")
-            exec(OCF_src_name + " = 0x09")
+            exec (OGF_src_name + " = 0x04")
+            exec (OCF_src_name + " = 0x09")
         else:
             target_entry_state = proj.factory.blank_state(addr=cand[0])
             opcode_src_name = "target_entry_state.regs.r" + str(cand[2])
-            exec(opcode_src_name + " = 0x1009")
+            exec (opcode_src_name + " = 0x1009")
 
         simgr = proj.factory.simgr(target_entry_state)
-        
+
         if MODE == 'DEV':
             target_addr = DEV_BDADDR_HANDLER_ADDR
         elif MODE == 'RASP':
             target_addr = RASP_BDADDR_HANDLER_ADDR
         elif MODE == 'NEXUS':
             target_addr = NEXUS_BDADDR_HANDLER_ADDR
-        
+
         def step_func(lsm):
             if MODE == 'DEV':
-                lsm.stash(filter_func=lambda state: check_regs_val(state, target_addr),
+                lsm.stash(filter_func=lambda state: check_regs_val(
+                    state, target_addr),
                           from_stash='active',
                           to_stash="found")
             if MODE == 'RASP':
-                lsm.stash(filter_func=lambda state: check_regs_val(state, target_addr),
+                lsm.stash(filter_func=lambda state: check_regs_val(
+                    state, target_addr),
                           from_stash='active',
                           to_stash="found")
             if MODE == 'NEXUS':
-                lsm.stash(filter_func=lambda state: check_regs_val(state, target_addr),
+                lsm.stash(filter_func=lambda state: check_regs_val(
+                    state, target_addr),
                           from_stash='active',
                           to_stash="found")
             return lsm
@@ -307,11 +312,11 @@ def symbolic_verification(proj, hci_cmd_disp_cand):
                 break
 
         # simgr.move(from_stash='active',
-                   # to_stash='found',
-                   # filter_func=lambda s: True)
+        # to_stash='found',
+        # filter_func=lambda s: True)
         # simgr.move(from_stash='found',
-                   # to_stash='active',
-                   # filter_func=lambda s: s.addr == 0x3ec59)
+        # to_stash='active',
+        # filter_func=lambda s: s.addr == 0x3ec59)
 
         # at the same time, we know where to find handler addr
         if flag:
@@ -339,7 +344,7 @@ def identification(proj, cfg, funcs):
     '''
     hci_cmd_disp_cand = []
 
-    # Naive scanning 
+    # Naive scanning
     hci_cmd_disp_cand = naive_scanning(funcs, hci_cmd_disp_cand)
     assert len(hci_cmd_disp_cand) >= 1
 
@@ -371,7 +376,6 @@ def main(argv):
     else:
         raise ValueError('mode error!')
 
-
     entry_point = int(get_entry_point(bin_path), 16)
     if MODE == "DEV":
         assert entry_point == 0x03bd
@@ -385,7 +389,7 @@ def main(argv):
                             'entry_point': entry_point
                         })
 
-    # Building CFG, it takes 10 - 20 mins 
+    # Building CFG, it takes 10 - 20 mins
     # if it takes too long for you, you can try pypy: https://github.com/angr/angr-dev
     # cfg = proj.analyses.CFGFast(show_progressbar=True)
     # pickle.dump(cfg, open("%s.p" % MODE, "wb"))
@@ -397,19 +401,20 @@ def main(argv):
 
     print(hci_cmd_disp)
 
-    # export to json 
+    # export to json
     info_dict = {
-            "name": MODE,
-            "func_addr": hci_cmd_disp[0],
-            "start_addr": hci_cmd_disp[1],
-            "opcode_reg": hci_cmd_disp[2],
-            "ogf_reg": hci_cmd_disp[3],
-            "ocf_reg": hci_cmd_disp[4],
-            "handler_addr": hci_cmd_disp[5],
-            "handler_reg": hci_cmd_disp[6]
-            }
+        "name": MODE,
+        "func_addr": hci_cmd_disp[0],
+        "start_addr": hci_cmd_disp[1],
+        "opcode_reg": hci_cmd_disp[2],
+        "ogf_reg": hci_cmd_disp[3],
+        "ocf_reg": hci_cmd_disp[4],
+        "handler_addr": hci_cmd_disp[5],
+        "handler_reg": hci_cmd_disp[6]
+    }
     with open("%s.json" % MODE, 'w') as json_file:
         json.dump(info_dict, json_file)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
