@@ -1,6 +1,9 @@
 from pwn import *
 from internalblue.hcicore import HCICore
 
+context.arch = 'thumb'
+context.endian = 'little'
+
 internalblue = HCICore()
 internalblue.interface = internalblue.device_list()[0][
     1]  # just use the first device
@@ -15,17 +18,14 @@ log.info("Installing patches for a2dp")
 code = b"""
         @ save regs
         push {r0, r1, r2, r3, r4, r5, r6, r7}
-
         @ create opcode and store it in r0
         mov r0, r2, lsl #8
         add r0, r3
-
         @ go through HCI jmptable and see if we find the opcode.
         ldr r7, =0xffff
         ldr r6, =jmptable
         ldr r2, =0
         ldr r4, =10
-
         loop:
         mul r3, r2, r4
         ldrh r5, [r6, r3]
@@ -35,14 +35,12 @@ code = b"""
         beq unsupported
         add r2, r2, 1
         b loop
-
         @ we did not find the opcode: set dummy values and return
         unsupported:
         ldr r5, =0
         str r5, [r1, #0x0]
         str r5, [r1, #0x4]
         b return
-
         @we found the opcode: set fptr and someValue
         found:
         add r3, r3, 2  @ get fptr
@@ -51,12 +49,10 @@ code = b"""
         add r3, r3, 4  @ get someValue
         ldr r5, [r6, r3]
         str r5, [r1, #0x4]
-
         @ restore regs and return
         return:
         pop {r0, r1, r2, r3, r4, r5, r6, r7}
         bx lr
-
         @ HCI whilelist
         jmptable:
             .hword 0x1101
