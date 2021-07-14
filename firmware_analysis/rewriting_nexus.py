@@ -2,7 +2,7 @@ from pwn import *
 from internalblue.adbcore import ADBCore
 from pwnlib.asm import asm
 from binascii import unhexlify
-from IPython import embed
+import sys
 
 context.arch = 'thumb'
 context.endian = 'little'
@@ -11,8 +11,10 @@ context.endian = 'little'
 HOOK_HCI_DISPATCHER = 0x99dc
 ASM_LOCATION_HCI = 0x00211900
 
-with open("./gatt.txt", "r") as f:
+filename = sys.argv[1]
+with open(filename, "r") as f:
     WHITELIST = f.readlines()
+
 # mark the end
 WHITELIST.append('ffff')
 WHITELIST = [x.strip() for x in WHITELIST]
