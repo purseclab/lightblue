@@ -2,6 +2,7 @@ from pwn import *
 from internalblue.adbcore import ADBCore
 from pwnlib.asm import asm
 from binascii import unhexlify
+from IPython import embed
 
 context.arch = 'thumb'
 context.endian = 'little'
@@ -13,20 +14,14 @@ ASM_LOCATION_HCI = 0x00211900
 with open("./gatt.txt", "r") as f:
     WHITELIST = f.readlines()
 # mark the end
-WHITELIST.append('7777')
+WHITELIST.append('ffff')
 WHITELIST = [x.strip() for x in WHITELIST]
 WHITELIST = [hex(int(x, base=16))[2:] for x in WHITELIST]
 WHITELIST = ['0' + x if len(x) == 3 else x for x in WHITELIST]
 
 # print(WHITELIST)
 
-# WHITELIST_BYTE = unhexlify(''.join(WHITELIST))
-
 code = """
-        // test
-        ubfx r1, r0, 0x0, 0xa
-        b 0x99e0
-
         // save regs
         push {r2, r3, r4}
 
@@ -35,11 +30,12 @@ code = """
 
         // go through HCI whitelist and see if we find the opcode.
         whitelist_loop:
-        ldrh r4, [r2, 0x2]
+        ldrh r4, [r2, 0x0]
         cmp r0, r4
         beq return
         cmp r3, r4
         beq unsupported
+        adds r2, 2
         b whitelist_loop
 
         // we did not find the opcode: set unsupported values and return:
@@ -51,7 +47,7 @@ code = """
         return:
         ubfx r1, r0, 0x0, 0xa
         pop {r2, r3, r4}
-        b 0x99dc
+        b 0x99e0
 
         // HCI whilelist
         whitelist:
@@ -75,6 +71,7 @@ log.info("Installing patches for nexus 5")
 
 log.info("Writing ASM snippet.")
 codeBytes = asm(code, vma=ASM_LOCATION_HCI)
+
 if not internalblue.writeMem(address=ASM_LOCATION_HCI, data=codeBytes, progress_log=None):
     log.critical("error!")
     exit(-1)
