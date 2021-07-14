@@ -391,7 +391,6 @@ We take A2DP as an example.
 ## 2. Firmware Debloating
 
 ### 2.1 Dependency 
-It is recommnded to use Dockerfile in ```firmware_analysis```.
 
 #### 2.1.1 [angr](http://angr.io/)
 
@@ -399,6 +398,7 @@ It is recommnded to use Dockerfile in ```firmware_analysis```.
 $ mkvirtualenv lightblue
 $ pip install angr
 ```
+It is recommnded to use [Docker](https://github.com/angr/angr-dev/blob/master/Dockerfile) to install angr.
 
 #### 2.1.2 [internalblue](https://github.com/seemoo-lab/internalblue)
 
@@ -433,7 +433,7 @@ We include the firmware of nrf52_pca10040 (acting as a beacon) in ```/firmware``
 This step identify the instruction address and resgister which relates to HCI opcode/command handler, and locate the HCI command dispatcher function. 
 
 ```
-$ python3 analysis.py TARGET
+$ python analysis.py TARGET
 ```
 
 ```TARGET``` is one of the following: 
@@ -443,11 +443,25 @@ $ python3 analysis.py TARGET
 - ```rasp```: BCM2837 (Raspberry pi 3)
 - ```nrf```: nRF52 Development Kit (PCA10040) 
 
-It will return the address of the HCI command dispatcher and corresponding registers. This command takes around 20 minutes since it takes some time for angr to recover CFG. 
+This command takes around 20 minutes since it takes some time for angr to recover CFG. It will generate a json file (TARGET.json) including the following:
+
+- ```func_addr```: the address of HCI command dispatcher
+- ```start_addr```: the address where opcode parsing is finished
+- ```opcode_reg```: the register where the opcode is stored
+- ```ogf_reg```: the register where the ogf is stored
+- ```ocf_reg```: the register where the ocf is stored
+- ```handler_addr```: the address where handler is extracted 
+- ```handler_reg```: the register where the handler is stored
 
 ### 2.4 HCI command handler extraction
 
-With the information from 2.3 Firmware analysis, we extract the address for each HCI command handler in this step. 
+With the information from 2.3 Firmware analysis, we extract the address for each HCI command handler in this step with the following command:
+
+```
+$ python extraction.py TARGET
+```
+
+It will generate a pickle file describing the address of each HCI command handler. It is a dict where ```handler_dic[ogf][ocf] = addr```.  
 
 ### 2.5 Firmware rewriting and examples
 
@@ -472,14 +486,13 @@ $ btattach -B /dev/ttyUSB0
 Sometimes, you need to plug/unplug the evaluation board multiple times and run a combination of the commands above. 
 If setup was successful can be checked with hciconfig. A MAC address with all zeros indicates that the baud rate was not set correctly and you need to try again.
 
+Then you can run ```$ python rewriting_dev.py``` for debloating the Bluetooth firmware. 
 
-Run “python dev_analysis.py”, which will output the rewriting address for the script “a2dp-debloat.py”. 
-
-Then you can run ```$ python a2dp-debloat.py``` for debloating the Bluetooth firmware. 
-
-```a2dp-debloat.py``` has already embedded the needed HCI command (line 74 - line 220). 
+```rewriting_dev.py``` has already embedded the needed HCI command (line 74 - line 220). 
 It uses internalblue rewriting utility to rewrite the Bluetooth firmware, and disable the unneeded HCI commands. 
 
 
 #### 2.5.2 Only keeping GATT on Nexus 5 (Sqaure App example)
 It is an example where the Bluetooth stack (including host and firmware) on Nexus 5 is specialized for Squaure, a point-of-sale app. 
+
+Just connect your Nexus 5 and enable USB debug (in developer setting), and run the script ```rewriting_nexus.py```. 
