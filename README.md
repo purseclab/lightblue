@@ -495,4 +495,8 @@ It uses internalblue rewriting utility to rewrite the Bluetooth firmware, and di
 #### 2.5.2 Only keeping GATT on Nexus 5 (Sqaure App example)
 It is an example where the Bluetooth stack (including host and firmware) on Nexus 5 is specialized for Squaure, a point-of-sale app. 
 
-Just connect your Nexus 5 and enable USB debug (in developer setting), and run the script ```rewriting_nexus.py```. 
+Just connect your Nexus 5 and enable USB debug (in developer setting), and run the following script 
+
+```python rewriting_nexus.py gatt.txt```
+
+```gatt.txt``` contains the list of used HCI command acquired from host analysis, which can be replaced with other HCI command list (e.g. a2dp.txt).
