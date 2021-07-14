@@ -391,9 +391,9 @@ def main(argv):
 
     # Building CFG, it takes 10 - 20 mins
     # if it takes too long for you, you can try pypy: https://github.com/angr/angr-dev
-    # cfg = proj.analyses.CFGFast(show_progressbar=True)
+    cfg = proj.analyses.CFGFast(show_progressbar=True)
     # pickle.dump(cfg, open("%s.p" % MODE, "wb"))
-    cfg = pickle.load(open("%s.p" % MODE, "rb"))
+    # cfg = pickle.load(open("%s.p" % MODE, "rb"))
     funcs = cfg.kb.functions
 
     # hci command dispatcher identification
