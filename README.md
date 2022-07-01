@@ -2,6 +2,8 @@
 
 This is the code repository for our USENIX'21 paper ([LIGHTBLUE : Automatic Profile-Aware Debloating of Bluetooth Stacks](https://github.com/purseclab/lightblue/blob/master/lightblue.pdf)).
 
+A video [tutorial](https://purdue0-my.sharepoint.com/:v:/g/personal/wu1220_purdue_edu/ES8PJm2ykDhNk7Xr8pJaBzAB4aXBzanF6fa6vQctcFWl6w) and an environment-ready virtual machine [image](https://purdue0-my.sharepoint.com/:u:/g/personal/wu1220_purdue_edu/EaC0BbTZdm5Fvul2PMYhlWoBnHAHNR_8pgqtYwVbz3m8FQ) are available!
+
 ## 0. Directory Explanation
 
 The *llvmpass* folder contains the code for our LLVM pass.
